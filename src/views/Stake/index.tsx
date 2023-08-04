@@ -46,9 +46,9 @@ export default function Stake() {
 	  const bribeVaultAddress = bribeVaultAddresses[0] // TO-DO: iterate each BribeVault and show rewards from each?
 	  const bribeWizard = new Wizard({
         signerOrProvider: signer,
-        frenDelegationBribeVaultAddress 
+        frenDelegationBribeVaultAddress: bribeVaultAddress
       })
-      const bribeData = bribeWizard.utils.getFrenDelegationBribesByBLS(value)
+      const bribeData = await bribeWizard.utils.getFrenDelegationBribesByBLS(value)
 	  return bribeData
     catch(err: any){
       return false
