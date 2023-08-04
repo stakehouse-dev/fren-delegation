@@ -37,19 +37,19 @@ export default function Stake() {
     setMevMax(0)
     setBlsKey('')
     setWizard(null)
-	bribe = isValidatorIncentivized(value)
+	  bribe = isValidatorIncentivized(value)
   }
 
   const isValidatorIncentivized = (value: string) => {
     try {
-	  const bribeVaultAddresses = makeFrenDelegationBribeVaultAddress()
-	  const bribeVaultAddress = bribeVaultAddresses[0] // TO-DO: iterate each BribeVault and show rewards from each?
-	  const bribeWizard = new Wizard({
+	    const bribeVaultAddresses = makeFrenDelegationBribeVaultAddress()
+	    const bribeVaultAddress = bribeVaultAddresses[0] // TO-DO: iterate each BribeVault and show rewards from each?
+	    const bribeWizard = new Wizard({
         signerOrProvider: signer,
         frenDelegationBribeVaultAddress: bribeVaultAddress
       })
       const bribeData = await bribeWizard.utils.getFrenDelegationBribesByBLS(value)
-	  return bribeData
+	    return bribeData
     catch(err: any){
       return false
     }

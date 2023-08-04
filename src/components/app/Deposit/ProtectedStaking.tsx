@@ -10,7 +10,7 @@ import { ReactComponent as ArrowTopRightIcon } from '@/assets/images/icon-arrow-
 import { Button, CompletedTxView, ErrorModal, LoadingModal, ModalDialog } from '@/components/shared'
 import { MAX_GAS_FEE } from '@/constants'
 import { useDeposit, useNetworkBasedLinkFactories, useUser } from '@/hooks'
-import { humanReadableAddress } from '@/utils/global'
+import { changeInput, humanReadableAddress } from '@/utils/global'
 
 import ModalInvalidDeposit from '../Modals/ModalInvalidDeposit'
 
@@ -96,8 +96,9 @@ export default function ProtectedStaking() {
               value={amount}
               placeholder="Amount"
               onChange={(e) => {
-                if (!isNaN(Number(e.target.value))) {
-                  setAmount(e.target.value)
+                const val = parseFloat('0' + e.target.value)
+                if (!isNaN(val)) {
+                  setAmount(changeInput(e.target.value))
                 }
               }}
               className="text-xl text-grey25 bg-black outline-none"

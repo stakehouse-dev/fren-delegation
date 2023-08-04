@@ -139,7 +139,7 @@ export default function ValidatorDetails({ blsKey, bribeData }: { blsKey: string
                 </span>
               </Stat>
             </Box>
-		  }
+		  )}
         </div>
       )}
     </>

@@ -156,3 +156,14 @@ export function isTxRejectedByUser(err: any): boolean {
   const USER_DENIED_CODE = 4001
   return err?.code === USER_DENIED_CODE || err?.code === 'ACTION_REJECTED'
 }
+
+export const changeInput = (val: string) => {
+  if (val.includes('.')) {
+    const belowDotNumbers = val.split('.')[1]
+    const fixedBelowDotNumbers = belowDotNumbers.slice(0, 3)
+    const fullNumber = `${val.split('.')[0]}.${fixedBelowDotNumbers}`
+    return fullNumber
+  } else {
+    return val
+  }
+}

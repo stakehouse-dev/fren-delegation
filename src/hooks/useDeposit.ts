@@ -15,7 +15,7 @@ export const useDeposit = () => {
     async (blsKey: string, amount: string, ethValue: BigNumber) => {
       setIsLoading(true)
 
-      const tx = await wizard?.savETHPool.depositETHForStaking(blsKey, amount, ethValue)
+      const tx = await wizard?.savETHPool.batchDepositETHForStaking([blsKey], [amount], amount)
 
       notifyHash(tx.hash, activeChain?.id)
       await tx.wait()
