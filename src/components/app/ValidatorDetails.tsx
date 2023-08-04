@@ -139,7 +139,7 @@ export default function ValidatorDetails({
               </span>
             </Stat>
           </Box>
-          {data && data.lsdvalidator && !loading && bribeState && (
+          {data && data.lsdvalidator && !loading && (bribeState.tokenToEthRatio.hex > 0) && (
             <Box>
               <div className="text-grey700">Incentives available</div>
               <Stat>
@@ -150,7 +150,7 @@ export default function ValidatorDetails({
                 <span className="text-grey700">
                   <span className="text-primary">
                     {(
-                      Number(bribeState.tokenToEthRatio.toString()) /
+                      Number(bribeState.tokenToEthRatio.hex.toString()) /
                       10 ** Number(bribeState.tokenDecimals)
                     ).toLocaleString(undefined, { maximumFractionDigits: 3 })}{' '}
                     {bribeState.tokenName}
