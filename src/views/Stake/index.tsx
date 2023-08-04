@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import tw from 'twin.macro'
 import { useConnect, useSigner } from 'wagmi'
-
+import { Wizard } from '@blockswaplab/lsd-wizard'
 import { ReactComponent as CloseIcon } from '@/assets/images/close-icon.svg'
 import { ModalWalletConnect } from '@/components/app'
 import ValidatorDetails from '@/components/app/ValidatorDetails'
 import { Button } from '@/components/shared'
-import { useSDK, useUser } from '@/hooks'
+import { useSDK, useUser, useNetworkBasedLinkFactories } from '@/hooks'
 
 export default function Stake() {
   const { isConnected } = useConnect()
@@ -21,7 +21,7 @@ export default function Stake() {
   const { mevMax, protectedMax, setProtectedMax, setMevMax, setBlsKey, blsKey } = useUser()
 
   const [key, setKey] = useState<string>(blsKey)
-  const bribe = false
+  let bribe = false
   const { setWizard, wizard } = useSDK()
 
   const handleOpenWalletModal = () => {
@@ -31,26 +31,29 @@ export default function Stake() {
     setOpenWalletModal(false)
   }
 
-  const handleChange = (value: string) => {
+  const handleChange = async (value: string) => {
     setKey(value)
     setProtectedMax(0)
     setMevMax(0)
     setBlsKey('')
     setWizard(null)
-	bribe = isValidatorIncentivized(value)
+    bribe = await isValidatorIncentivized(value)
   }
 
-  const isValidatorIncentivized = (value: string) => {
+  const isValidatorIncentivized = async (value: string) => {
     try {
-	  const bribeVaultAddresses = makeFrenDelegationBribeVaultAddress()
-	  const bribeVaultAddress = bribeVaultAddresses[0] // TO-DO: iterate each BribeVault and show rewards from each?
-	  const bribeWizard = new Wizard({
+      const bribeVaultAddresses = makeFrenDelegationBribeVaultAddress()
+      const bribeVaultAddress = bribeVaultAddresses[0] // TO-DO: iterate each BribeVault and show rewards from each?
+      const bribeWizard = new Wizard({
         signerOrProvider: signer,
-        frenDelegationBribeVaultAddress 
+        liquidStakingManagerAddress: '0x0000000000000000000000000000000000000000', // If we do not do this, the utils package will not be initialised
+        frenDelegationBribeVaultAddress: bribeVaultAddress
       })
-      const bribeData = bribeWizard.utils.getFrenDelegationBribesByBLS(value)
-      return bribeData;
-    } catch(err: any) {
+      const data = await bribeWizard.utils.getFrenDelegationBribesByBLS(value)
+      console.log('data', data)
+      return data
+    } catch (err: any) {
+      console.log('Bribe error', err)
       return false
     }
   }

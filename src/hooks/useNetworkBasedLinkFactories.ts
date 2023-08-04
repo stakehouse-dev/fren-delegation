@@ -1,6 +1,11 @@
 import { useNetwork } from 'wagmi'
 
-import { beaconUrls, explorerUrls, supportedChains, frenDelegationBribeVaultAddresses } from '@/constants/chains'
+import {
+  beaconUrls,
+  explorerUrls,
+  supportedChains,
+  frenDelegationBribeVaultAddresses
+} from '@/constants/chains'
 import { remove0x } from '@/utils/global'
 
 export function useNetworkBasedLinkFactories() {
@@ -23,5 +28,5 @@ export function useNetworkBasedLinkFactories() {
     return `${beaconUrl}/validator/${remove0x(account)}`
   }
 
-  return { makeEtherscanLink, makeBeaconLink }
+  return { makeEtherscanLink, makeBeaconLink, makeFrenDelegationBribeVaultAddress }
 }

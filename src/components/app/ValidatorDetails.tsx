@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client'
 import { Wizard } from '@blockswaplab/lsd-wizard'
 import { formatEther } from 'ethers/lib/utils'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import tw from 'twin.macro'
 import { useSigner } from 'wagmi'
 
@@ -11,16 +11,31 @@ import { ValidatorQuery } from '@/graphql/queries/ValidatorQuery'
 import { useSDK, useUser } from '@/hooks'
 import { humanReadableAddress } from '@/utils/global'
 
-export default function ValidatorDetails({ blsKey, bribeData }: { blsKey: string, bribeData: any }) {
+export default function ValidatorDetails({
+  blsKey,
+  bribeData
+}: {
+  blsKey: string
+  bribeData: any
+}) {
   const { protectedMax, mevMax, setProtectedMax, setMevMax, setBlsKey } = useUser()
   const { setWizard } = useSDK()
   const { data: signer } = useSigner()
+  const [bribeState, setBribeState] = useState({
+    tokenToEthRatio: '',
+    tokenDecimals: '',
+    tokenName: ''
+  })
 
   const { loading, data } = useQuery(ValidatorQuery, {
     variables: { blsKey },
     fetchPolicy: 'cache-and-network',
     skip: blsKey.length != 98 || !blsKey.startsWith('0x')
   })
+
+  if (bribeData && bribeData.id && bribeData.tokenDecimals) {
+    setBribeState(bribeData)
+  }
 
   useEffect(() => {
     if (signer && data && data.lsdvalidator) {
@@ -124,22 +139,27 @@ export default function ValidatorDetails({ blsKey, bribeData }: { blsKey: string
               </span>
             </Stat>
           </Box>
-          {data && data.lsdvalidator && !loading && bribeData && (
+          {data && data.lsdvalidator && !loading && bribeState && (
             <Box>
               <div className="text-grey700">Incentives available</div>
               <Stat>
                 <Label>
-                  Earn up to <Tooltip message="Receive ERC-20 tokens for funding specific validators" />
+                  Earn up to{' '}
+                  <Tooltip message="Receive ERC-20 tokens for funding specific validators" />
                 </Label>
                 <span className="text-grey700">
                   <span className="text-primary">
-                    {(bribeData.tokenToEthRatio / (10**bribeData.tokenDecimals)).toLocaleString(undefined, { maximumFractionDigits: 3 })} {' '} {bribeData.tokenName}
-                  </span>
-				 {' '} per 1 ETH
+                    {(
+                      Number(bribeState.tokenToEthRatio.toString()) /
+                      10 ** Number(bribeState.tokenDecimals)
+                    ).toLocaleString(undefined, { maximumFractionDigits: 3 })}{' '}
+                    {bribeState.tokenName}
+                  </span>{' '}
+                  per 1 ETH
                 </span>
               </Stat>
             </Box>
-		  )}
+          )}
         </div>
       )}
     </>
