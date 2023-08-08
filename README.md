@@ -1,5 +1,5 @@
 # Fren Delegation
-Collectively stake 32 ETH for a validator by just sharing the BLS public key.  
+Collectively stake 32 ETH for a validator by just sharing the BLS public key...  
 A node operator that has already registered a BLS public key in the LSD Network by depositing 4 ETH, can invite others to to deposit ETH for this BLS public key. Once the BLS public key has colelcted 32 ETH, the node operator can stake and run a valdiator.  
 All the depositors will get LP tokens, in return of ETH, depending on the pro rata share of their deposit.
 
