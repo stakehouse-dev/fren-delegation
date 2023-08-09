@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import tw from 'twin.macro'
 import { useConnect, useSigner } from 'wagmi'
-import { Wizard } from '@blockswaplab/lsd-wizard'
+
 import { ReactComponent as CloseIcon } from '@/assets/images/close-icon.svg'
 import { ModalWalletConnect } from '@/components/app'
 import ValidatorDetails from '@/components/app/ValidatorDetails'
@@ -14,14 +14,13 @@ export default function Stake() {
   const navigate = useNavigate()
 
   const { data: signer } = useSigner()
-  const { makeFrenDelegationBribeVaultAddress } = useNetworkBasedLinkFactories()
 
   const [openWalletModal, setOpenWalletModal] = useState(false)
 
   const { mevMax, protectedMax, setProtectedMax, setMevMax, setBlsKey, blsKey } = useUser()
 
   const [key, setKey] = useState<string>(blsKey)
-  let bribe = false
+
   const { setWizard, wizard } = useSDK()
 
   const handleOpenWalletModal = () => {
@@ -37,25 +36,6 @@ export default function Stake() {
     setMevMax(0)
     setBlsKey('')
     setWizard(null)
-    bribe = await isValidatorIncentivized(value)
-  }
-
-  const isValidatorIncentivized = async (value: string) => {
-    try {
-      const bribeVaultAddresses = makeFrenDelegationBribeVaultAddress()
-      const bribeVaultAddress = bribeVaultAddresses[0] // TO-DO: iterate each BribeVault and show rewards from each?
-      const bribeWizard = new Wizard({
-        signerOrProvider: signer,
-        liquidStakingManagerAddress: '0x0000000000000000000000000000000000000000', // If we do not do this, the utils package will not be initialised
-        frenDelegationBribeVaultAddress: bribeVaultAddress
-      })
-      const data = await bribeWizard.utils.getFrenDelegationBribesByBLS(value)
-      console.log('data', data)
-      return data
-    } catch (err: any) {
-      console.log('Bribe error', err)
-      return false
-    }
   }
 
   return (
@@ -90,7 +70,7 @@ export default function Stake() {
                 </div>
               )}
             </div>
-            <ValidatorDetails blsKey={key} bribeData={bribe} />
+            <ValidatorDetails blsKey={key} />
             <div className="w-full flex gap-3 mt-2">
               <Button
                 size="lg"

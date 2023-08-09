@@ -1,31 +1,25 @@
 import { useQuery } from '@apollo/client'
 import { Wizard } from '@blockswaplab/lsd-wizard'
-import { formatEther } from 'ethers/lib/utils'
+import { formatEther, formatUnits } from 'ethers/lib/utils'
 import { useEffect, useState } from 'react'
 import tw from 'twin.macro'
 import { useSigner } from 'wagmi'
 
+import { BigNumber } from 'ethers'
 import { ReactComponent as EthIcon } from '@/assets/images/icon-eth.svg'
 import { ClipboardCopy, Spinner, Tooltip } from '@/components/shared'
 import { ValidatorQuery } from '@/graphql/queries/ValidatorQuery'
-import { useSDK, useUser } from '@/hooks'
+import { useNetworkBasedLinkFactories, useSDK, useUser } from '@/hooks'
 import { humanReadableAddress } from '@/utils/global'
+import { ethers } from 'ethers'
 
-export default function ValidatorDetails({
-  blsKey,
-  bribeData
-}: {
-  blsKey: string
-  bribeData: any
-}) {
+export default function ValidatorDetails({ blsKey }: { blsKey: string }) {
   const { protectedMax, mevMax, setProtectedMax, setMevMax, setBlsKey } = useUser()
   const { setWizard } = useSDK()
   const { data: signer } = useSigner()
-  const [bribeState, setBribeState] = useState({
-    tokenToEthRatio: '',
-    tokenDecimals: '',
-    tokenName: ''
-  })
+  const [bribeState, setBribeState] = useState<any>()
+
+  const { makeFrenDelegationBribeVaultAddress } = useNetworkBasedLinkFactories()
 
   const { loading, data } = useQuery(ValidatorQuery, {
     variables: { blsKey },
@@ -33,9 +27,26 @@ export default function ValidatorDetails({
     skip: blsKey.length != 98 || !blsKey.startsWith('0x')
   })
 
-  if (bribeData && bribeData.id && bribeData.tokenDecimals) {
-    setBribeState(bribeData)
-  }
+  useEffect(() => {
+    const isValidatorIncentivized = async (value: string) => {
+      try {
+        const bribeVaultAddresses = makeFrenDelegationBribeVaultAddress()
+        const bribeVaultAddress = bribeVaultAddresses[0] // TO-DO: iterate each BribeVault and show rewards from each?
+        const bribeWizard = new Wizard({
+          signerOrProvider: signer,
+          liquidStakingManagerAddress: '0x0000000000000000000000000000000000000000', // If we do not do this, the utils package will not be initialised
+          frenDelegationBribeVaultAddress: bribeVaultAddress
+        })
+
+        const data = await bribeWizard.utils.getFrenDelegationBribesByBLS(value)
+        setBribeState(data)
+      } catch (err: any) {
+        console.log('Bribe error', err)
+      }
+    }
+
+    isValidatorIncentivized(blsKey)
+  }, [])
 
   useEffect(() => {
     if (signer && data && data.lsdvalidator) {
@@ -139,7 +150,7 @@ export default function ValidatorDetails({
               </span>
             </Stat>
           </Box>
-          {data && data.lsdvalidator && !loading && Number(bribeState.tokenToEthRatio) > 0 && (
+          {data && data.lsdvalidator && !loading && bribeState && (
             <Box>
               <div className="text-grey700">Incentives available</div>
               <Stat>
@@ -149,9 +160,8 @@ export default function ValidatorDetails({
                 </Label>
                 <span className="text-grey700">
                   <span className="text-primary">
-                    {(
-                      Number(bribeState.tokenToEthRatio.toString()) /
-                      10 ** Number(bribeState.tokenDecimals)
+                    {Number(
+                      formatUnits(bribeState.tokenToEthRatio, bribeState.tokenDecimals)
                     ).toLocaleString(undefined, { maximumFractionDigits: 3 })}{' '}
                     {bribeState.tokenName}
                   </span>{' '}
