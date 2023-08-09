@@ -34,7 +34,7 @@ export default function ValidatorDetails({
   })
 
   useEffect(() => {
-	if (bribeData && bribeData.id && bribeData.tokenDecimals && (bribeData.tokenToEthRatio > 0) ) {
+	if (bribeData && && bribeData.tokenDecimals && (bribeData.tokenToEthRatio > 0) ) {
 		console.log(bribeData); // TO-DO: Remove debug logging
 		setBribeState(bribeData);
 		console.log(bribeState); // TO-DO: Remove debug logging
