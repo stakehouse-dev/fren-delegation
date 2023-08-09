@@ -5,13 +5,11 @@ import { useEffect, useState } from 'react'
 import tw from 'twin.macro'
 import { useSigner } from 'wagmi'
 
-import { BigNumber } from 'ethers'
 import { ReactComponent as EthIcon } from '@/assets/images/icon-eth.svg'
 import { ClipboardCopy, Spinner, Tooltip } from '@/components/shared'
 import { ValidatorQuery } from '@/graphql/queries/ValidatorQuery'
 import { useNetworkBasedLinkFactories, useSDK, useUser } from '@/hooks'
 import { humanReadableAddress } from '@/utils/global'
-import { ethers } from 'ethers'
 
 export default function ValidatorDetails({ blsKey }: { blsKey: string }) {
   const { protectedMax, mevMax, setProtectedMax, setMevMax, setBlsKey } = useUser()
@@ -39,14 +37,16 @@ export default function ValidatorDetails({ blsKey }: { blsKey: string }) {
         })
 
         const data = await bribeWizard.utils.getFrenDelegationBribesByBLS(value)
+
         setBribeState(data)
       } catch (err: any) {
         console.log('Bribe error', err)
       }
     }
 
+    setBribeState(undefined)
     isValidatorIncentivized(blsKey)
-  }, [])
+  }, [blsKey])
 
   useEffect(() => {
     if (signer && data && data.lsdvalidator) {
