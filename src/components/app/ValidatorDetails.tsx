@@ -33,11 +33,13 @@ export default function ValidatorDetails({
     skip: blsKey.length != 98 || !blsKey.startsWith('0x')
   })
 
-  if (bribeData && bribeData.id && bribeData.tokenDecimals) {
-    setBribeState(bribeData)
-  }
-
   useEffect(() => {
+	if (bribeData && && bribeData.tokenDecimals && (bribeData.tokenToEthRatio > 0) ) {
+		console.log(bribeData); // TO-DO: Remove debug logging
+		setBribeState(bribeData);
+		console.log(bribeState); // TO-DO: Remove debug logging
+	}
+
     if (signer && data && data.lsdvalidator) {
       const protectedStakingLPs = data.lptokens.filter(
         (token: any) => token.tokenType === 'PROTECTED_STAKING_LP'
